@@ -21,6 +21,10 @@ def APL(x):
     This type is basically a Numpy array with some internal
     new features.
     """
+    if isinstance(x, (np.integer, int,
+                                 np.floating, float,
+                                 np.complexfloating, complex)):
+        return _apl(np.array([x])) # scalar
     return _apl(np.array(x))
 
 __all__ = ['APL', 'index', 'rho',

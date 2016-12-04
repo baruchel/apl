@@ -6,21 +6,71 @@ apl_offset = 0
 
 class DomainError(Exception):
     pass
+class RankError(Exception):
+    pass
 
-class APLArray(np.ndarray):
+class AplArray(np.ndarray):
     def apl_rho(self):
         if len(self.__apl_stops__) == 0:
             return _apl(np.array(self.shape))
         return _apl(np.array(self.shape[:self.__apl_stops__[0]]))
 
 def _apl(a):
-    a = a.view(APLArray)
+    a = a.view(AplArray)
     a.__apl_stops__ = []
     return a
 
 def rho(_right, _left=None):
     if _left == None: # monadic
         return _right.apl_rho()
+    else:
+        if isinstance(_right, AplArray):
+            if len(_right.__apl_stops__):
+                stops = _right.__apl_stops__
+                r = _right.shape[stops[0]:]
+            else:
+                stops = []
+                r = tuple([])
+        elif isinstance(_right, np.ndarray):
+            stops = []
+            r = tuple([])
+        elif isinstance(_right, (tuple, list)):
+            _right = np.array(_right)
+            stops = []
+            r = tuple([])
+        elif isinstance(_right, (np.integer, int,
+                                 np.floating, float,
+                                 np.complexfloating, complex)):
+            _right = np.array([_right])
+            stops = []
+            r = tuple([])
+        else:
+            raise DomainError(_right)
+        if isinstance(_left, AplArray):
+            # TODO: erreur en cas de stops ?
+            _left = tuple(_left.apl_rho())
+        elif isinstance(_left, np.ndarray):
+            # TODO: erreur en cas de stops ?
+            _left = tuple(_left)
+        elif isinstance(_left, (tuple, list)):
+            _left = tuple(_left)
+        elif isinstance(_left, (np.integer, int,
+                                 np.floating, float,
+                                 np.complexfloating, complex)):
+            _left = (_left,)
+        else:
+            raise DomainError(_left)
+        # TODO: erreur si _left multidimensionnel
+        n = np.prod(_left) * np.prod(r)
+        _right = np.tile(_right.flatten(),
+                      np.ceil(float(n) / np.prod(_right.shape)))
+        _right = _apl(_right[:n].reshape(_left + r))
+        _right.__apl_stops__ = [ x - stops[0]+len(_left)
+                                 for x in stops ]
+        return _right
+
+        
+        
 
 def index(_right, _left=None):
     if _left == None: # monadic
@@ -36,7 +86,7 @@ def index(_right, _left=None):
                 return index(_right.real)
             else:
                 raise DomainError(_right)
-        elif isinstance(_right, (APLArray, np.ndarray)):
+        elif isinstance(_right, (AplArray, np.ndarray)):
             s = _right.shape
             n = len(s)
             if n > 1:

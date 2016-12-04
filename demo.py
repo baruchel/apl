@@ -22,6 +22,7 @@ print(index(APL([2,3])))
 a = index(APL((2,3,4)))
 print(rho(a))
 
+print(rho(rho(rho(APL([[1,2],[3,4]])))))
 
 
 print(parse_line(u"⍳(3J3+.5j¯3)-.5"))
