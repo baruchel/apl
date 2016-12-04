@@ -8,7 +8,7 @@ import numpy as np
 
 from .core import (
           # internal methods
-          _apl,
+          _apl, AplArray,
           # public methods
           index, rho
         )
@@ -21,6 +21,10 @@ def APL(x):
     This type is basically a Numpy array with some internal
     new features.
     """
+    if isinstance(x, AplArray):
+        y = _apl(x)
+        y.__apl_stops__ = x.__apl_stops__
+        return y
     if isinstance(x, (np.integer, int,
                                  np.floating, float,
                                  np.complexfloating, complex)):
