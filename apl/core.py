@@ -23,7 +23,8 @@ def _apl(a):
 def rho(_right, _left=None):
     if _left == None: # monadic
         return _right.apl_rho()
-    else:
+    else: # dyadic
+        # Right argument
         if isinstance(_right, AplArray):
             if len(_right.__apl_stops__):
                 stops = _right.__apl_stops__
@@ -46,30 +47,29 @@ def rho(_right, _left=None):
             r = tuple([])
         else:
             raise DomainError(_right)
+        # Left argument
         if isinstance(_left, AplArray):
-            # TODO: erreur en cas de stops ?
-            _left = tuple(_left.apl_rho())
+            if len(_left.__apl_stops__) or len(_left.shape) > 1:
+                raise ValueError(_left)
+            _left = tuple(_left)
         elif isinstance(_left, np.ndarray):
-            # TODO: erreur en cas de stops ?
+            if len(_left.shape) > 1:
+                raise ValueError(_left)
             _left = tuple(_left)
         elif isinstance(_left, (tuple, list)):
-            _left = tuple(_left)
+            return rho(_right, np.array(_left))
         elif isinstance(_left, (np.integer, int,
                                  np.floating, float,
                                  np.complexfloating, complex)):
             _left = (_left,)
         else:
             raise DomainError(_left)
-        # TODO: erreur si _left multidimensionnel
         n = np.prod(_left) * np.prod(r)
         _right = np.tile(_right.flatten(),
                       np.ceil(float(n) / np.prod(_right.shape)))
         _right = _apl(_right[:n].reshape(_left + r))
-        _right.__apl_stops__ = [ x - stops[0]+len(_left)
-                                 for x in stops ]
+        _right.__apl_stops__ = [ x - stops[0]+len(_left) for x in stops ]
         return _right
-
-        
         
 
 def index(_right, _left=None):
@@ -110,5 +110,5 @@ def index(_right, _left=None):
             return index(np.array(_right))
         else:
             raise DomainError(_right)
-
-        
+    else: # dyadic
+        pass # TODO
