@@ -24,4 +24,4 @@ print(rho(a))
 
 
 
-print(parse_line(u"(0J1+.5j¯3)-2"))
+print(parse_line(u"⍳(3J3+.5j¯3)-.5"))
