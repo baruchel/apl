@@ -44,4 +44,6 @@ def parse_line(l):
     tokens = token.tokenize(l)
     check_delimiters(tokens)
     tokens = clean_numbers(tokens)
+    # TODO
+    print("TODO")
     return tokens
