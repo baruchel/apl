@@ -45,25 +45,29 @@ def rho(_right, _left=None):
             _right = np.array([_right])
             stops = []
             r = tuple([])
-        else:
-            raise DomainError(_right)
+        else: raise DomainError(_right)
         # Left argument
         if isinstance(_left, AplArray):
             if len(_left.__apl_stops__) or len(_left.shape) > 1:
                 raise ValueError(_left)
+            tmp = _left.real.astype(np.int)
+            if np.all(_left == tmp): _left = tmp
+            else: raise DomainError(_left)
             _left = tuple(_left)
         elif isinstance(_left, np.ndarray):
-            if len(_left.shape) > 1:
-                raise ValueError(_left)
+            if len(_left.shape) > 1: raise ValueError(_left)
+            tmp = _left.real.astype(np.int)
+            if np.all(_left == tmp): _left = tmp
+            else: raise DomainError(_left)
             _left = tuple(_left)
         elif isinstance(_left, (tuple, list)):
             return rho(_right, np.array(_left))
         elif isinstance(_left, (np.integer, int,
                                  np.floating, float,
                                  np.complexfloating, complex)):
-            _left = (_left,)
-        else:
-            raise DomainError(_left)
+            if _left == int(_left): _left = (_left,)
+            else: raise DomainError(_left)
+        else: raise DomainError(_left)
         n = np.prod(_left) * np.prod(r)
         _right = np.tile(_right.flatten(),
                       np.ceil(float(n) / np.prod(_right.shape)))

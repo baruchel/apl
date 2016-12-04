@@ -23,6 +23,7 @@ a = index(APL((2,3,4)))
 print(rho(a))
 
 print(rho([1,0,0,0], [3,3]))
+print(rho([1,0,0,0], APL([3,3])))
 print(rho(rho(rho(APL([[1,2],[3,4]])))))
 
 
