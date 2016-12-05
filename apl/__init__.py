@@ -6,10 +6,11 @@ __version__ = '0.1'
 
 import numpy as np
 
-from .core import (
-          # internal methods
+from .internal import (
           _apl, AplArray,
-          # public methods
+        )
+
+from .core import (
           index, rho
         )
 
