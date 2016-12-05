@@ -7,7 +7,9 @@ from .internal import (
         _apl_ensure, _apl_vector_ensure, _apl_raw_vector_ensure
         )
 
+
 apl_offset = 0
+
 
 def rho(_right, _left=None):
     if _left == None: # monadic

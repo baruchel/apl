@@ -14,6 +14,10 @@ from .core import (
           index, rho
         )
 
+from .arithmetic import (
+          add, sub
+        )
+
 from .parse import parse_line
 
 def APL(x):
@@ -23,7 +27,7 @@ def APL(x):
     new features.
     """
     if isinstance(x, AplArray):
-        return _apl(x, stops = x.__apl_stops__)
+        return _apl(np.array(x), stops = x.__apl_stops__)
     if isinstance(x, (np.integer, int,
                                  np.floating, float,
                                  np.complexfloating, complex)):
@@ -31,6 +35,7 @@ def APL(x):
     return _apl(np.array(x))
 
 __all__ = ['APL', 'index', 'rho',
+           'add', 'sub', 
            # to be removed later
            'parse_line'
           ]
