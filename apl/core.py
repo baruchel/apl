@@ -71,8 +71,6 @@ def index(_right, _left=None):
                          + apl_offset)
         _right = np.atleast_3d( _left.reshape( (1, rho2[0]) + ts2 )
                 == _right.reshape( (np.prod(rho), 1) + ts2 ) ).all(2)
-        return _right
-        # TODO
-        _right = np.array([ list(r).index(True) for r in _right ])
-        # TODO: add apl_offset and reshape
-        return _right
+        tmp = np.argmax(_right, axis=1)
+        tmp = (_right[:,0] == tmp)*rho2[0] + tmp + apl_offset
+        return _apl(tmp.reshape(rho))
