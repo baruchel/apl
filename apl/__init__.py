@@ -23,9 +23,7 @@ def APL(x):
     new features.
     """
     if isinstance(x, AplArray):
-        y = _apl(x)
-        y.__apl_stops__ = x.__apl_stops__
-        return y
+        return _apl(x, stops = x.__apl_stops__)
     if isinstance(x, (np.integer, int,
                                  np.floating, float,
                                  np.complexfloating, complex)):
