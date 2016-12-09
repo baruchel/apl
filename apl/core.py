@@ -76,3 +76,30 @@ def index(_right, _left=None):
         tmp = np.argmax(_right, axis=1)
         tmp = (_right[:,0] == tmp)*rho2[0] + tmp + apl_offset
         return _apl(tmp.reshape(rho))
+
+
+def make_monadic_dyadic_scalar_f(m, d):
+    """
+    Return a monadic/dyadic scalar function.
+    """
+    def f(_right, _left=None, _axis=[]):
+        if _left == None: # monadic
+            _right, _, stops, _ = _apl_ensure(_right)
+            return _apl(m(_right), stops = stops)
+        else: # dyadic
+            _axis, _, _, _ = _apl_raw_vector_ensure(_axis)
+            _axis = [ x - apl_offset for x in _axis ]
+            # TODO: by default, add 1 to shape:
+            # axis : conserver les dimensions nommées et mettre les autres à 1
+            #    cf. manuel, p. 72
+            # either one is scalar or rho=rho2
+            # >>> a=np.array([[1,2],[3,4]])
+            # >>> b=np.array([[[1,2],[3,4]],[[5,6],[7,8]]])
+            # >>> a.reshape((2,2,1))+b
+            # a ← 2 2 ⍴ 1 2 3 4
+            # b ← 2 2 ⍴ (1 2) (3 4) (5 6) (7 8)
+            # a + b
+            print("AX", _axis)
+            
+            pass # TODO
+    return f
