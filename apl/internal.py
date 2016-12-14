@@ -25,8 +25,7 @@ class AplArray(np.ndarray):
         s = ""
         a = self.apl_struct()
         for k in a:
-            s += "(" + ("x".join([str(x) for x in k]))
-            if k: s += "x"
+            s += "(" + ("".join([str(x)+"x" for x in k]))
         return s[1:-1] + (")" * (len(a)-1))
     def __repr__(self):
         N = np.ndarray.__repr__(self)
