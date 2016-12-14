@@ -4,7 +4,8 @@ import numpy as np
 from .internal import (
         DomainError, RankError,
         _apl, AplArray,
-        _apl_ensure, _apl_vector_ensure, _apl_raw_vector_ensure
+        _apl_ensure, _apl_vector_ensure, _apl_raw_vector_ensure,
+        _apl_disclose_ensure # TODO: remove
         )
 
 
@@ -87,8 +88,13 @@ def make_monadic_dyadic_scalar_f(m, d):
             _right, _, stops, _ = _apl_ensure(_right)
             return _apl(m(_right), stops = stops)
         else: # dyadic
-            _axis, _, _, _ = _apl_raw_vector_ensure(_axis)
-            _axis = [ x - apl_offset for x in _axis ]
+            if _axis:
+                _axis, _, _, _ = _apl_raw_vector_ensure(_axis)
+                if len(_axis) != len(set(_axis)):
+                    raise RankError(_axis)
+                _axis = [ x - apl_offset for x in _axis ]
+            lstruct, rstruct = _left.apl_struct(), _right.apl_struct()
+
             # TODO: by default, add 1 to shape:
             # axis : conserver les dimensions nommées et mettre les autres à 1
             #    cf. manuel, p. 72
