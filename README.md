@@ -21,7 +21,7 @@ Right now, I am focusing on internal functions. I wrote a (working) lexer but I 
 
 I would be happy to have people trying the code and report the bugs.
 
-I would be very happy to have some contributors writing some documentation.
+I would be very happy to have some contributors writing some documentation. The Wiki page on Github would probably be a good place. Writing a nice page in docs/ which is displayed at https://baruchel.github.io/apl/ would be nice also. Creating a logo would be helpful also.
 
 A small but useful contribution would be to re-write the `__repr__` method in apl/internal.py in order to have a better display for the arrays.
 
