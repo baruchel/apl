@@ -6,8 +6,8 @@ from .core import make_monadic_dyadic_scalar_f
 add = make_monadic_dyadic_scalar_f(lambda x: x, np.add)
 
 
-sub = make_monadic_dyadic_scalar_f(np.negative, np.subtract)
-
+sub = make_monadic_dyadic_scalar_f(np.negative,
+        lambda _right, _left: np.subtract(_left, _right))
 
 
 def _direction(_right):
@@ -19,7 +19,9 @@ mul = make_monadic_dyadic_scalar_f(_direction, np.multiply)
 def _reciprocal(_right):
     with np.errstate(divide='ignore', invalid='ignore'):
         return 1./_right
-div = make_monadic_dyadic_scalar_f(_reciprocal, np.divide)
+div = make_monadic_dyadic_scalar_f(_reciprocal,
+        lambda _right, _left: np.divide(_left, _right))
+
 
 def _residue(_right, _left):
     with np.errstate(divide='ignore', invalid='ignore'):

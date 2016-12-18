@@ -53,17 +53,18 @@ def _apl_ensure(_right):
             rho, tailshape = _right.shape, tuple([])
     elif isinstance(_right, np.ndarray):
         stops = []
+        _right = _apl(np.array([_right]))
         rho, tailshape = _right.shape, tuple([])
     elif isinstance(_right, (np.integer, int,
                              np.floating, float,
                              np.complexfloating, complex)):
-        _right = np.array([_right])
         stops = []
+        _right = _apl(np.array([_right]))
         rho, tailshape = (1,), tuple([])
     else: # list, tuple, range, etc.
         try:
-            _right = np.array(_right)
             stops = []
+            _right = _apl(np.array(_right))
             rho, tailshape = _right.shape, tuple([])
         except:
             raise TypeError(_right)
