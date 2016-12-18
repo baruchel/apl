@@ -23,6 +23,8 @@ I would be happy to have people trying the code and report the bugs.
 
 I would be very happy to have some contributors writing some documentation.
 
+A small but useful contribution would be to re-write the `__repr__` method in apl/internal.py in order to have a better display for the arrays.
+
 I created a mailing list at https://groups.io/g/apl/
 
 There is no documentation yet, but the root directory contains some demo files.
