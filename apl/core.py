@@ -82,7 +82,6 @@ def index(_right, _left=None):
 def make_monadic_dyadic_scalar_f(m, d):
     """
     Return a monadic/dyadic scalar function.
-    TODO: arguments in 'd' must be left, right???
     """
     def f(_right, _left=None, _axis=[]):
         if _left == None: # monadic
@@ -100,18 +99,46 @@ def make_monadic_dyadic_scalar_f(m, d):
             ls, rs = tuple([]), tuple([])
             for i in range(max(ln, rn)):
                 if i < ln and lstruct[i]:
-                    ls += lstruct[i]
                     if i < rn and rstruct[i]:
-                        # TODO _axis
+                        if _axis:
+                            if _axis[-1] < len(lstruct[i]):
+                                A = tuple(lstruct[i][j] for j in _axis)
+                                if A == rstruct[i]:
+                                    S = [1]*len(lstruct[i])
+                                    for j in _axis: S[j] = lstruct[i][j]
+                                    ls += lstruct[i]
+                                    rs += tuple(S)
+                                    _axis = None
+                                    continue
+                            if _axis[-1] < len(rstruct[i]):
+                                A = tuple(rstruct[i][j] for j in _axis)
+                                if A == lstruct[i]:
+                                    S = [1]*len(rstruct[i])
+                                    for j in _axis: S[j] = rstruct[i][j]
+                                    rs += rstruct[i]
+                                    ls += tuple(S)
+                                    _axis = None
+                                    continue
+                            raise ValueError("Invalid axis") # TODO
                         if lstruct[i] == rstruct[i]:
+                            ls += lstruct[i]
                             rs += rstruct[i]
                         else: raise RankError(_left.apl_struct(),
                                               _right.apl_struct())
-                    else: rs += (1,)
+                    else:
+                        ls += lstruct[i]
+                        rs += (1,) * len(lstruct[i])
+                    _axis = None
                 else:
-                    ls += (1,)
-                    if i < rn and rstruct[i]: rs += rstruct[i]
-                    else: rs += (1,)
+                    if i < rn and rstruct[i]:
+                        rs += rstruct[i]
+                        ls += (1,) * len(rstruct[i])
+                        _axis = None
+                    else:
+                        # TODO: utile ?
+                        ls += (1,)
+                        rs += (1,)
+            print("DEBUG (1):", _left.shape, _right.shape)
             print("DEBUG (1):", ls, rs)
             return _apl(
                 d(_left.reshape(ls), _right.reshape(rs)) )
