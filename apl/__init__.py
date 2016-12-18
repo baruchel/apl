@@ -9,7 +9,7 @@ import numpy as np
 from .internal import (
           _apl, AplArray,
           # Exceptions:
-          DomainError, RankError
+          DomainError, RankError, InvalidAxisError
         )
 
 from .core import (
@@ -41,5 +41,5 @@ __all__ = ['APL', 'index', 'rho',
            # to be removed later
            'parse_line',
            # Exceptions:
-           'DomainError', 'RankError'
+           'DomainError', 'RankError', 'InvalidAxisError'
           ]

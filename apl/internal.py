@@ -8,6 +8,8 @@ class DomainError(AplError):
     pass
 class RankError(AplError):
     pass
+class InvalidAxisError(AplError):
+    pass
 
 
 
@@ -87,21 +89,3 @@ def _apl_raw_vector_ensure(_right):
     if len(stops):
         raise RankError(_right.apl_struct()) # TODO?
     return _right, rho, stops, tailshape
-
-# TODO: remove
-def _apl_disclose_ensure(_right):
-    """
-    Disclose array if needed. Argument should be an APL array.
-    """
-    stops = _right.__apl_stops__
-    shape = _right.shape
-    if stops:
-        for i, s in enumerate(stops):
-            if shape[i] != 1 or i != s:
-                if i == 0: break
-                a = _apl(_right.reshape(shape[i:]),
-                         stops = [(x-i) for x in stops[i:]])
-                return a
-    return _right
-
-
