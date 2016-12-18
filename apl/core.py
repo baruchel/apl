@@ -95,6 +95,7 @@ def make_monadic_dyadic_scalar_f(m, d):
             lstruct, rstruct = _left.apl_struct(), _right.apl_struct()
             ln, rn = len(lstruct), len(rstruct)
             ls, rs = tuple([]), tuple([])
+            stops = []
             for i in range(max(ln, rn)):
                 if i < ln and lstruct[i]:
                     if i < rn and rstruct[i]:
@@ -113,11 +114,11 @@ def make_monadic_dyadic_scalar_f(m, d):
                                 if A == lstruct[i]:
                                     S = [1]*len(rstruct[i])
                                     for j in _axis: S[j] = rstruct[i][j]
-                                    rs += rstruct[i]
                                     ls += tuple(S)
+                                    rs += rstruct[i]
                                     _axis = None
                                     continue
-                            raise ValueError("Invalid axis") # TODO
+                            raise InvalidAxisError(_axis)
                         if lstruct[i] == rstruct[i]:
                             ls += lstruct[i]
                             rs += rstruct[i]
@@ -133,9 +134,7 @@ def make_monadic_dyadic_scalar_f(m, d):
                         ls += (1,) * len(rstruct[i])
                         _axis = None
                     else:
-                        # TODO: utile ?
-                        ls += (1,)
-                        rs += (1,)
+                        stops.append(len(ls))
             return _apl(
                 d(_left.reshape(ls), _right.reshape(rs)) )
     return f
