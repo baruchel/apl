@@ -10,6 +10,7 @@ class RankError(AplError):
     pass
 
 
+
 class AplArray(np.ndarray):
     def apl_rho(self):
         if len(self.__apl_stops__) == 0:
@@ -21,12 +22,12 @@ class AplArray(np.ndarray):
             struct.append((self.shape)[s:i])
             s = i
         return struct
-    def apl_pretty_struct(self):
+    def apl_pretty_struct(self, sep="x"):
         s = ""
         a = self.apl_struct()
         for k in a:
-            s += "(" + ("".join([str(x)+"x" for x in k]))
-        return s[1:-1] + (")" * (len(a)-1))
+            s += "(" + ("".join([str(x) + sep for x in k]))
+        return s[1:-len(sep)] + (")" * (len(a)-1))
     def __repr__(self):
         N = np.ndarray.__repr__(self)
         s = self.apl_pretty_struct()
@@ -73,7 +74,7 @@ def _apl_vector_ensure(_right):
     """
     _right, rho, stops, tailshape = _apl_ensure(_right)
     if len(rho) > 1:
-        raise RankError(_right)
+        raise RankError(_right.apl_struct())
     return _right, rho, stops, tailshape
 
 def _apl_raw_vector_ensure(_right):
@@ -82,9 +83,9 @@ def _apl_raw_vector_ensure(_right):
     """
     _right, rho, stops, tailshape = _apl_ensure(_right)
     if len(rho) > 1:
-        raise RankError(_right) # TODO?
+        raise RankError(_right.apl_struct()) # TODO?
     if len(stops):
-        raise RankError(_right) # TODO?
+        raise RankError(_right.apl_struct()) # TODO?
     return _right, rho, stops, tailshape
 
 # TODO: remove

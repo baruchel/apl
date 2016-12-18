@@ -82,6 +82,7 @@ def index(_right, _left=None):
 def make_monadic_dyadic_scalar_f(m, d):
     """
     Return a monadic/dyadic scalar function.
+    TODO: arguments in 'd' must be left, right???
     """
     def f(_right, _left=None, _axis=[]):
         if _left == None: # monadic
@@ -91,9 +92,31 @@ def make_monadic_dyadic_scalar_f(m, d):
             if _axis:
                 _axis, _, _, _ = _apl_raw_vector_ensure(_axis)
                 if len(_axis) != len(set(_axis)):
-                    raise RankError(_axis)
+                    raise RankError(_axis.apl_struct())
                 _axis = [ x - apl_offset for x in _axis ]
+            print("DEBUG (0):", _axis)
             lstruct, rstruct = _left.apl_struct(), _right.apl_struct()
+            ln, rn = len(lstruct), len(rstruct)
+            ls, rs = tuple([]), tuple([])
+            for i in range(max(ln, rn)):
+                if i < ln and lstruct[i]:
+                    ls += lstruct[i]
+                    if i < rn and rstruct[i]:
+                        # TODO _axis
+                        if lstruct[i] == rstruct[i]:
+                            rs += rstruct[i]
+                        else: raise RankError(_left.apl_struct(),
+                                              _right.apl_struct())
+                    else: rs += (1,)
+                else:
+                    ls += (1,)
+                    if i < rn and rstruct[i]: rs += rstruct[i]
+                    else: rs += (1,)
+            print("DEBUG (1):", ls, rs)
+            return _apl(
+                d(_left.reshape(ls), _right.reshape(rs)) )
+
+
 
             # TODO: by default, add 1 to shape:
             # axis : conserver les dimensions nommées et mettre les autres à 1
@@ -105,7 +128,5 @@ def make_monadic_dyadic_scalar_f(m, d):
             # a ← 2 2 ⍴ 1 2 3 4
             # b ← 2 2 ⍴ (1 2) (3 4) (5 6) (7 8)
             # a + b
-            print("AX", _axis)
             
-            pass # TODO
     return f

@@ -8,6 +8,8 @@ import numpy as np
 
 from .internal import (
           _apl, AplArray,
+          # Exceptions:
+          DomainError, RankError
         )
 
 from .core import (
@@ -37,5 +39,7 @@ def APL(x):
 __all__ = ['APL', 'index', 'rho',
            'add', 'sub', 'mul', 'div',
            # to be removed later
-           'parse_line'
+           'parse_line',
+           # Exceptions:
+           'DomainError', 'RankError'
           ]
