@@ -2,7 +2,7 @@
 
 import numpy as np
 from .internal import (
-        DomainError, RankError,
+        DomainError, RankError, InvalidAxisError,
         _apl, AplArray,
         _apl_ensure, _apl_vector_ensure, _apl_raw_vector_ensure,
         )
@@ -108,6 +108,7 @@ def make_monadic_dyadic_scalar_f(m, d):
                                     ls += lstruct[i]
                                     rs += tuple(S)
                                     _axis = None
+                                    stops.append(len(ls))
                                     continue
                             if _axis[-1] < len(rstruct[i]):
                                 A = tuple(rstruct[i][j] for j in _axis)
@@ -117,6 +118,7 @@ def make_monadic_dyadic_scalar_f(m, d):
                                     ls += tuple(S)
                                     rs += rstruct[i]
                                     _axis = None
+                                    stops.append(len(ls))
                                     continue
                             raise InvalidAxisError(_axis)
                         if lstruct[i] == rstruct[i]:
@@ -133,8 +135,9 @@ def make_monadic_dyadic_scalar_f(m, d):
                         rs += rstruct[i]
                         ls += (1,) * len(rstruct[i])
                         _axis = None
-                    else:
-                        stops.append(len(ls))
+                stops.append(len(ls))
+            stops.pop()
             return _apl(
-                d(_left.reshape(ls), _right.reshape(rs)) )
+                d(_left.reshape(ls), _right.reshape(rs)),
+                stops = stops)
     return f
