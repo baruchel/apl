@@ -17,7 +17,7 @@ from .core import (
         )
 
 from .arithmetic import (
-          add, sub, mul, div
+          add, sub, mul, div, residue
         )
 
 from .parse import parse_line
@@ -37,7 +37,7 @@ def APL(x):
     return _apl(np.array(x))
 
 __all__ = ['APL', 'index', 'rho',
-           'add', 'sub', 'mul', 'div',
+           'add', 'sub', 'mul', 'div', 'residue',
            # to be removed later
            'parse_line',
            # Exceptions:

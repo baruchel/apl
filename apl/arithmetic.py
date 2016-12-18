@@ -20,3 +20,8 @@ def _reciprocal(_right):
     with np.errstate(divide='ignore', invalid='ignore'):
         return 1./_right
 div = make_monadic_dyadic_scalar_f(_reciprocal, np.divide)
+
+def _residue(_right, _left):
+    with np.errstate(divide='ignore', invalid='ignore'):
+        return np.mod(_right, _left) + (_left == 0)*_right
+residue = make_monadic_dyadic_scalar_f(np.abs, _residue)
