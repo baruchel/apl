@@ -124,11 +124,15 @@ def make_monadic_dyadic_scalar_f(m, d):
                                     stops.append(len(ls))
                                     continue
                             raise InvalidAxisError(_axis)
-                        if ( lstruct[i] == rstruct[i]
-                                or lstruct[i] == (1,)
-                                or rstruct[i] == (1,) ):
+                        if lstruct[i] == rstruct[i]:
                             ls += lstruct[i]
                             rs += rstruct[i]
+                        elif lstruct[i] == (1,):
+                            ls += (1,) * len(rstruct[i])
+                            rs += rstruct[i]
+                        elif rstruct[i] == (1,):
+                            ls += lstruct[i]
+                            rs += (1,) * len(lstruct[i])
                         else: raise RankError(_left.apl_struct(),
                                               _right.apl_struct())
                     else:
