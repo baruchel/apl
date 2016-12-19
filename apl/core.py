@@ -81,7 +81,7 @@ def index(_right, _left=None):
 def make_monadic_dyadic_scalar_f(m, d):
     """
     Return a monadic/dyadic scalar function.
-    For dyadic functions, the order of the arguments should be (right, left).
+    For dyadic functions, the order of the arguments should be (left, right).
     """
     def f(_right, _left=None, _axis=[]):
         if _left == None: # monadic

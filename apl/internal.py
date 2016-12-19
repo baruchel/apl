@@ -53,7 +53,7 @@ def _apl_ensure(_right):
             rho, tailshape = _right.shape, tuple([])
     elif isinstance(_right, np.ndarray):
         stops = []
-        _right = _apl(np.array([_right]))
+        _right = _apl(_right)
         rho, tailshape = _right.shape, tuple([])
     elif isinstance(_right, (np.integer, int,
                              np.floating, float,
