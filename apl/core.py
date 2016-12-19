@@ -127,10 +127,10 @@ def make_monadic_dyadic_scalar_f(m, d):
                         if lstruct[i] == rstruct[i]:
                             ls += lstruct[i]
                             rs += rstruct[i]
-                        elif lstruct[i] == (1,):
+                        elif all(x==1 for x in lstruct[i]):
                             ls += (1,) * len(rstruct[i])
                             rs += rstruct[i]
-                        elif rstruct[i] == (1,):
+                        elif all(x==1 for x in rstruct[i]):
                             ls += lstruct[i]
                             rs += (1,) * len(lstruct[i])
                         else: raise RankError(_left.apl_struct(),
