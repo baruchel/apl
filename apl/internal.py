@@ -73,7 +73,7 @@ def _apl_raw_vector_ensure(right):
     right = _apl_ensure(right)
     rho = right.apl_rho()
     if len(rho) > 1:
-        raise RankError(_right.apl_struct()) # TODO?
+        raise RankError(right.apl_struct()) # TODO?
     if len(right.__apl_stops__):
-        raise RankError(_right.apl_struct()) # TODO?
+        raise RankError(right.apl_struct()) # TODO?
     return right
