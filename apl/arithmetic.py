@@ -25,3 +25,7 @@ def _residue(_left, _right):
     with np.errstate(divide='ignore', invalid='ignore'):
         return np.mod(_right, _left) + (_left == 0)*_right
 residue = make_monadic_dyadic_scalar_f(np.abs, _residue)
+
+min = make_monadic_dyadic_scalar_f(np.floor, np.min)
+max = make_monadic_dyadic_scalar_f(np.ceil, np.max)
+power = make_monadic_dyadic_scalar_f(np.exp, np.power)

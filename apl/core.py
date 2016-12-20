@@ -147,6 +147,6 @@ def make_monadic_dyadic_scalar_f(m, d):
                 stops.append(len(ls))
             stops.pop()
             return _apl(
-                d(_right.reshape(rs), _left.reshape(ls)),
+                d(_left.reshape(rs), _right.reshape(ls)),
                 stops = stops)
     return f
