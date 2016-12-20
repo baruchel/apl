@@ -42,51 +42,38 @@ def _apl(a, stops=[]):
     return a
 
 
-def _apl_ensure(_right):
-    if isinstance(_right, AplArray):
-        if len(_right.__apl_stops__):
-            stops = _right.__apl_stops__
-            rho = _right.shape[:stops[0]]
-            tailshape = _right.shape[stops[0]:]
-        else:
-            stops = []
-            rho, tailshape = _right.shape, tuple([])
-    elif isinstance(_right, np.ndarray):
-        stops = []
-        _right = _apl(_right)
-        rho, tailshape = _right.shape, tuple([])
-    elif isinstance(_right, (np.integer, int,
+def _apl_ensure(right):
+    if isinstance(right, AplArray): return right
+    elif isinstance(right, np.ndarray): return _apl(right)
+    elif isinstance(right, (np.integer, int,
                              np.floating, float,
                              np.complexfloating, complex)):
-        stops = []
-        _right = _apl(np.array([_right]))
-        rho, tailshape = (1,), tuple([])
+        return _apl(np.array([right]))
     else: # list, tuple, range, etc.
         try:
-            stops = []
-            _right = _apl(np.array(_right))
-            rho, tailshape = _right.shape, tuple([])
+            return _apl(np.array(right))
         except:
             raise TypeError(_right)
-    return _right, rho, stops, tailshape
 
 
-def _apl_vector_ensure(_right):
+def _apl_vector_ensure(right):
     """
-    Return common parameters and checks that array is a vector.
+    Return an array after having checked it is a vector.
     """
-    _right, rho, stops, tailshape = _apl_ensure(_right)
+    right = _apl_ensure(right)
+    rho = right.apl_rho()
     if len(rho) > 1:
-        raise RankError(_right.apl_struct())
-    return _right, rho, stops, tailshape
+        raise RankError(right.apl_struct())
+    return right
 
-def _apl_raw_vector_ensure(_right):
+def _apl_raw_vector_ensure(right):
     """
-    Return common parameters and checks that array is a vector of scalars.
+    Return an array after having checked it is a vector of scalars.
     """
-    _right, rho, stops, tailshape = _apl_ensure(_right)
+    right = _apl_ensure(right)
+    rho = right.apl_rho()
     if len(rho) > 1:
         raise RankError(_right.apl_struct()) # TODO?
-    if len(stops):
+    if len(right.__apl_stops__):
         raise RankError(_right.apl_struct()) # TODO?
-    return _right, rho, stops, tailshape
+    return right

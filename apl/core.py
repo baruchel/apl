@@ -11,70 +11,86 @@ from .internal import (
 apl_offset = 0
 
 
-def rho(_right, _left=None):
-    if _left == None: # monadic
-        return _right.apl_rho()
+def rho(right, left=None):
+    if left == None: # monadic
+        return _apl_ensure(right).apl_rho()
     else: # dyadic
         # Right argument
-        _right, _, stops, tailshape = _apl_ensure(_right)
+        right = _apl_ensure(right)
+        stops = right.__apl_stops__
+        tailshape = right.shape[stops[0]:] if stops else tuple([])
         # Left argument
-        _left, _, stops2, _ = _apl_raw_vector_ensure(_left)
-        _left = tuple(_left)
-        n = np.prod(_left) * np.prod(tailshape)
-        _right = np.tile(_right.flatten(),
-                      np.ceil(float(n) / np.prod(_right.shape)))
-        _right = _apl(_right[:n].reshape(_left + tailshape))
-        _right.__apl_stops__ = [ x - stops[0]+len(_left) for x in stops ]
-        return _right
+        left = _apl_raw_vector_ensure(left)
+        left = tuple(left)
+        n = np.prod(left) * np.prod(tailshape)
+        right = np.tile(right.flatten(),
+                      np.ceil(float(n) / np.prod(right.shape)))
+        right = _apl(right[:n].reshape(left + tailshape))
+        right.__apl_stops__ = [ x - stops[0]+len(left) for x in stops ]
+        return right
         
 
-def index(_right, _left=None):
-    if _left == None: # monadic
-        if isinstance(_right, (np.integer, int)):
-            return _apl(np.arange(apl_offset, _right+apl_offset))
-        elif isinstance(_right, (np.floating, float)):
-            if int(_right)==_right:
-                return _apl(np.arange(apl_offset, int(_right)+apl_offset))
+def index(right, left=None):
+    if left == None: # monadic
+        if isinstance(right, (np.integer, int)):
+            return _apl(np.arange(apl_offset, right+apl_offset))
+        elif isinstance(right, (np.floating, float)):
+            if int(right)==right:
+                return _apl(np.arange(apl_offset, int(right)+apl_offset))
             else:
-                raise DomainError(_right)
-        elif isinstance(_right, (np.complexfloating, complex)):
-            if _right.imag==0:
-                return index(_right.real)
+                raise DomainError(right)
+        elif isinstance(right, (np.complexfloating, complex)):
+            if right.imag==0:
+                return index(right.real)
             else:
-                raise DomainError(_right)
-        elif isinstance(_right, (AplArray, np.ndarray)):
-            s = _right.shape
+                raise DomainError(right)
+        elif isinstance(right, (AplArray, np.ndarray)):
+            s = right.shape
             n = len(s)
             if n > 1:
-                raise DomainError(_right)
+                raise DomainError(right)
             elif s[0] == 1: # identify as a scalar
-                return index(_right[0])
+                return index(right[0])
             else:
-                if not np.issubdtype(_right.dtype, np.integer):
+                if not np.issubdtype(right.dtype, np.integer):
                     # following line will raise an error for complex
-                    #if np.any(np.mod(_right, 1) != 0):
-                    tmp = _right.real.astype(np.int)
-                    if np.all(_right == tmp):
-                        _right = tmp
+                    #if np.any(np.mod(right, 1) != 0):
+                    tmp = right.real.astype(np.int)
+                    if np.all(right == tmp):
+                        right = tmp
                     else:
-                        raise DomainError(_right)
+                        raise DomainError(right)
                 return _apl(np.rollaxis(
-                              np.indices(_right)+apl_offset, 0, s[0]+1),
+                              np.indices(right)+apl_offset, 0, s[0]+1),
                         stops = [s[0]])
-        elif isinstance(_right, (tuple, list)):
-            return index(np.array(_right))
+        elif isinstance(right, (tuple, list)):
+            return index(np.array(right))
         else:
-            raise DomainError(_right)
+            raise DomainError(right)
     else: # dyadic
-        _right, rho, stops, tailshape = _apl_ensure(_right)
-        _left, rho2, stops2, ts2 = _apl_vector_ensure(_left)
+        right = _apl_ensure(right)
+        stops = right.__apl_stops__
+        if stops:
+            rho = right.shape[:stops[0]]
+            tailshape = right.shape[stops[0]:]
+        else:
+            rho = right.shape
+            tailshape = tuple([])
+        left = _apl_vector_ensure(left)
+        stops2 = left.__apl_stops__
+        if stops2:
+            rho2 = left.shape[:stops2[0]]
+            ts2 = left.shape[stops2[0]:]
+        else:
+            rho2 = left.shape
+            ts2 = tuple([])
         if tailshape != ts2:
             return _apl(np.array([rho2[0]] * int(np.prod(rho))).reshape(rho)
                          + apl_offset)
-        _right = np.atleast_3d( _left.reshape( (1, rho2[0]) + ts2 )
-                == _right.reshape( (np.prod(rho), 1) + ts2 ) ).all(2)
-        tmp = np.argmax(_right, axis=1)
-        tmp = (_right[:,0] == tmp)*rho2[0] + tmp + apl_offset
+        right = np.atleast_3d( left.reshape( (1, rho2[0]) + ts2 )
+                == right.reshape( (np.prod(rho), 1) + ts2 ) ).all(2)
+        tmp = np.argmax(right, axis=1)
+        tmp = (right[:,0] == tmp)*rho2[0] + tmp + apl_offset
         return _apl(tmp.reshape(rho))
 
 
@@ -83,19 +99,19 @@ def make_monadic_dyadic_scalar_f(m, d):
     Return a monadic/dyadic scalar function.
     For dyadic functions, the order of the arguments should be (left, right).
     """
-    def f(_right, _left=None, _axis=[]):
-        if _left == None: # monadic
-            _right, _, stops, _ = _apl_ensure(_right)
-            return _apl(m(_right), stops = stops)
+    def f(right, left=None, _axis=[]):
+        if left == None: # monadic
+            right, _, stops, _ = _apl_ensure(right)
+            return _apl(m(right), stops = stops)
         else: # dyadic
             if _axis:
-                _axis, _, _, _ = _apl_raw_vector_ensure(_axis)
+                _axis = _apl_raw_vector_ensure(_axis)
                 if len(_axis) != len(set(_axis)):
                     raise RankError(_axis.apl_struct())
                 _axis = [ x - apl_offset for x in _axis ]
-            _right, _, _, _ = _apl_ensure(_right)
-            _left, _, _, _ = _apl_ensure(_left)
-            lstruct, rstruct = _left.apl_struct(), _right.apl_struct()
+            right = _apl_ensure(right)
+            left = _apl_ensure(left)
+            lstruct, rstruct = left.apl_struct(), right.apl_struct()
             ln, rn = len(lstruct), len(rstruct)
             ls, rs = tuple([]), tuple([])
             stops = []
@@ -133,8 +149,8 @@ def make_monadic_dyadic_scalar_f(m, d):
                         elif all(x==1 for x in rstruct[i]):
                             ls += lstruct[i]
                             rs += (1,) * len(lstruct[i])
-                        else: raise RankError(_left.apl_struct(),
-                                              _right.apl_struct())
+                        else: raise RankError(left.apl_struct(),
+                                              right.apl_struct())
                     else:
                         ls += lstruct[i]
                         rs += (1,) * len(lstruct[i])
@@ -147,6 +163,6 @@ def make_monadic_dyadic_scalar_f(m, d):
                 stops.append(len(ls))
             stops.pop()
             return _apl(
-                d(_left.reshape(rs), _right.reshape(ls)),
+                d(left.reshape(ls), right.reshape(rs)),
                 stops = stops)
     return f
