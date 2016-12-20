@@ -18,7 +18,7 @@ from .core import (
 
 from .arithmetic import (
           add, sub, mul, div, residue,
-          min, max, power
+          min, max, power, log
         )
 
 from .parse import parse_line
@@ -39,7 +39,7 @@ def APL(x):
 
 __all__ = ['APL', 'index', 'rho',
            'add', 'sub', 'mul', 'div', 'residue',
-           'min', 'max', 'power',
+           'min', 'max', 'power', 'log',
            # to be removed later
            'parse_line',
            # Exceptions:
