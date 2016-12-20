@@ -99,16 +99,16 @@ def make_monadic_dyadic_scalar_f(m, d):
     Return a monadic/dyadic scalar function.
     For dyadic functions, the order of the arguments should be (left, right).
     """
-    def f(right, left=None, _axis=[]):
+    def f(right, left=None, axis=[]):
         if left == None: # monadic
             right, _, stops, _ = _apl_ensure(right)
             return _apl(m(right), stops = stops)
         else: # dyadic
-            if _axis:
-                _axis = _apl_raw_vector_ensure(_axis)
-                if len(_axis) != len(set(_axis)):
-                    raise RankError(_axis.apl_struct())
-                _axis = [ x - apl_offset for x in _axis ]
+            if axis:
+                axis = _apl_raw_vector_ensure(axis)
+                if len(axis) != len(set(axis)):
+                    raise RankError(axis.apl_struct())
+                axis = [ x - apl_offset for x in axis ]
             right = _apl_ensure(right)
             left = _apl_ensure(left)
             lstruct, rstruct = left.apl_struct(), right.apl_struct()
@@ -118,28 +118,28 @@ def make_monadic_dyadic_scalar_f(m, d):
             for i in range(max(ln, rn)):
                 if i < ln and lstruct[i]:
                     if i < rn and rstruct[i]:
-                        if _axis:
-                            if _axis[-1] < len(lstruct[i]):
-                                A = tuple(lstruct[i][j] for j in _axis)
+                        if axis:
+                            if axis[-1] < len(lstruct[i]):
+                                A = tuple(lstruct[i][j] for j in axis)
                                 if A == rstruct[i]:
                                     S = [1]*len(lstruct[i])
-                                    for j in _axis: S[j] = lstruct[i][j]
+                                    for j in axis: S[j] = lstruct[i][j]
                                     ls += lstruct[i]
                                     rs += tuple(S)
-                                    _axis = None
+                                    axis = None
                                     stops.append(len(ls))
                                     continue
-                            if _axis[-1] < len(rstruct[i]):
-                                A = tuple(rstruct[i][j] for j in _axis)
+                            if axis[-1] < len(rstruct[i]):
+                                A = tuple(rstruct[i][j] for j in axis)
                                 if A == lstruct[i]:
                                     S = [1]*len(rstruct[i])
-                                    for j in _axis: S[j] = rstruct[i][j]
+                                    for j in axis: S[j] = rstruct[i][j]
                                     ls += tuple(S)
                                     rs += rstruct[i]
-                                    _axis = None
+                                    axis = None
                                     stops.append(len(ls))
                                     continue
-                            raise InvalidAxisError(_axis)
+                            raise InvalidAxisError(axis)
                         if lstruct[i] == rstruct[i]:
                             ls += lstruct[i]
                             rs += rstruct[i]
@@ -154,12 +154,12 @@ def make_monadic_dyadic_scalar_f(m, d):
                     else:
                         ls += lstruct[i]
                         rs += (1,) * len(lstruct[i])
-                    _axis = None
+                    axis = None
                 else:
                     if i < rn and rstruct[i]:
                         rs += rstruct[i]
                         ls += (1,) * len(rstruct[i])
-                        _axis = None
+                        axis = None
                 stops.append(len(ls))
             stops.pop()
             return _apl(
